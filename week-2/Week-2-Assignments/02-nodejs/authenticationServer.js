@@ -29,9 +29,60 @@
   Testing the server - run `npm run test-authenticationServer` command in terminal
  */
 
-const express = require("express")
+const express = require("express");
+var jwt = require("jsonwebtoken");
+const JWT_SECRET = "secret";
 const PORT = 3000;
 const app = express();
+
 // write your logic here, DONT WRITE app.listen(3000) when you're running tests, the tests will automatically start the server
+app.post("/signup", (req, res) => {
+  const getInfo = {
+    username: req.body.username,
+    password: req.body.password,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+  };
+
+  if (!username || !password || !firstName || !lastName) {
+    return res.status(400).json({ msg: "Name and password are required" });
+  }
+
+  if (USERS.find((x) => x.username === username)) {
+    return res.status(400).json({ msg: "Username already exists" });
+  }
+
+  USERS.push(getInfo);
+
+  return res.status(201).json({
+    msg: "Created",
+  });
+});
+
+app.post("/login", (req, res) => {
+  const getInfo = {
+    username: req.body.username,
+    password: req.body.password,
+  };
+
+  const user = USERS.find((x) => x.email === getInfo.username);
+
+  if (!user) {
+    return res.status(403).json({ msg: "User not found" });
+  }
+
+  if (user.password !== password) {
+    return res.status(403).json({ msg: "Incorrect password" });
+  }
+
+  const token = jwt.sign(
+    {
+      id: user.id,
+    },
+    JWT_SECRET
+  );
+
+  return res.json({ token, id: user.id });
+});
 
 module.exports = app;

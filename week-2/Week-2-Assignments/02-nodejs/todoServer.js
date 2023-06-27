@@ -39,11 +39,63 @@
 
   Testing the server - run `npm run test-todoServer` command in terminal
  */
-const express = require('express');
-const bodyParser = require('body-parser');
-
+const express = require("express");
+const bodyParser = require("body-parser");
 const app = express();
-
+let USER_ID_COUNTER = 1;
+let TODO_LIST = [];
+const port = 3000
 app.use(bodyParser.json());
 
-module.exports = app;
+app.post("/todos", (req, res) => {
+  const getTodo = {
+    id: Math.floor((Math.random() * 100) + 1),
+    title: req.body.title,
+    description: req.body.description,
+  };
+  TODO_LIST.push(getTodo);
+  res.status(201).json({data:[getTodo]});
+});
+
+app.get("/todos", (req, res) => {
+   res.json({data:TODO_LIST});
+});
+
+app.get("/todos/:id", (req, res) => {
+  const id = parseInt(req.params.id)
+  const todo = TODO_LIST.find((e) => e.id === id);
+  if (!todo) {
+    res.status(404).send();
+  } else {
+    res.json(todo);
+  }
+});
+
+app.put("/todos/:id", (req, res) => {
+  const title = req.body.title;
+  const description = req.body.description;
+
+  const toDoIndex = TODO_LIST.findIndex((e) => e.id === parseInt(req.params.id));
+
+  if (toDoIndex <= -1) {
+    res.status(404).json("Todo list not found");
+  } else {
+    TODO_LIST[toDoIndex].title = title;
+    TODO_LIST[toDoIndex].description = description;
+    res.status(200).json(TODO_LIST[toDoIndex]);
+  }
+});
+
+app.delete("/todos/:id", (req, res) => {
+  const toDoIndex = TODO_LIST.findIndex((e) => e.id === parseInt(req.params.id));
+  if (toDoIndex <= -1) {
+    res.status(404).json("Todo list not found");
+  } else {
+    TODO_LIST.splice(toDoIndex, 1);
+    res.status(200).json("Todo item deleted");
+  }
+});
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
+})
