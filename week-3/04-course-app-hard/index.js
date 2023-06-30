@@ -228,38 +228,40 @@ app.get("/users/courses", validateUser, async (req, res) => {
   }
 });
 
-app.post("/users/courses/:courseId", validateUser, async(req, res) => {
+app.post("/users/courses/:courseId", validateUser, async (req, res) => {
   // logic to purchase a course
-  const courseId = req.params.courseId.toString();
+  const courseId = req.params.courseId;
+
+  const user = await User.findOne({ username: req.user.username });
+
+  console.log(user);
 
   const findCourse = await Courses.findById(courseId);
 
-  if(findCourse.length>0){
-
-    return res.status(201)
+  if (findCourse) {
+    if (user) {
+      user.purchasedCourses.push(findCourse);
+      await user.save();
+      res.json({ message: "Course purchased successfully" });
+    } else {
+      res.status(401).json({ message: "User not found" });
+    }
+  } else {
+    res.status(404).json({ message: "Course not found" });
   }
-
-
-
-  // Find the course with the provided courseId
-  // const courseIndex = COURSES.findIndex((e) => e.courseId === courseId);
-
-  // if (courseIndex === -1) {
-  //   res.status(404).json({ message: "Course not found" });
-  // } else {
-  //   // Purchase logic goes here
-  //   const selectedCourse = COURSES[courseIndex];
-  //   PURCHASED_COURSES.push(selectedCourse);
-  //   res.json({
-  //     message: "Course purchased successfully",
-  //     course: PURCHASED_COURSES,
-  //   });
-  // }
 });
 
-app.get("/users/purchasedCourses", validateUser, (req, res) => {
+app.get("/users/purchasedCourses", validateUser, async (req, res) => {
   // logic to view purchased courses
-  return res.status(201).json({ Courses: PURCHASED_COURSES });
+  const user = await User.findOne({ username: req.user.username }).populate(
+    "purchasedCourses"
+  );
+
+  if (user) {
+    res.json({ purchasedCourses: user.purchasedCourses });
+  } else {
+    res.json({ message: "User not found" });
+  }
 });
 // for all other routes, return 404
 app.use((req, res, next) => {

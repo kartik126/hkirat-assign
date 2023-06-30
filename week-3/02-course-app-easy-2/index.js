@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const jwt = require("jsonwebtoken");
 
+const mongoose = require("mongoose");
+
 const SECRET_KEY = "mysecretkey";
 
 app.use(express.json());
@@ -14,7 +16,7 @@ let PURCHASED_COURSES = [];
 // Admin routes
 
 const validateAdmin = (req, res, next) => {
-  const token = req.headers["authorization"].split(" ")[1];;
+  const token = req.headers["authorization"].split(" ")[1];
   console.log(token);
   if (!token) {
     return res.status(401).json({ message: "Token is not provided" });
@@ -111,14 +113,14 @@ app.put("/admin/courses/:courseId", validateAdmin, (req, res) => {
   }
 });
 
-app.get("/admin/courses", validateAdmin,(req, res) => {
+app.get("/admin/courses", validateAdmin, (req, res) => {
   // logic to get all courses
   return res.status(201).json({ COURSES });
 });
 
 // User routes
 const validateUser = (req, res, next) => {
-  const token = req.headers["authorization"].split(" ")[1];;
+  const token = req.headers["authorization"]?.split(" ")[1];
   console.log(token);
   if (!token) {
     return res.status(401).json({ message: "Token is not provided" });
@@ -156,21 +158,33 @@ app.post("/users/signup", (req, res) => {
 
 app.post("/users/login", (req, res) => {
   // logic to log in user
-  const { username, password } = req.headers;
+  const userData = {
+    username: req.headers.username,
+    password: req.headers.password,
+  };
 
-  if (USERS.find((e) => e.username === username && e.password === password)) {
-    return res.status(201).json({ message: "Logged in successfully" });
+  const token = jwt.sign(userData, SECRET_KEY, { expiresIn: "1h" });
+
+  if (
+    USERS.find(
+      (e) =>
+        e.username === userData.username && e.password === userData.password
+    )
+  ) {
+    return res
+      .status(201)
+      .json({ message: "Logged in successfully", Token: token });
   } else {
     return res.json({ message: "Username or Password is Incorrect" });
   }
 });
 
-app.get("/users/courses", validateUser,(req, res) => {
+app.get("/users/courses", validateUser, (req, res) => {
   // logic to list all courses
   return res.status(201).json({ Courses: COURSES });
 });
 
-app.post("/users/courses/:courseId",validateUser, (req, res) => {
+app.post("/users/courses/:courseId", validateUser, (req, res) => {
   // logic to purchase a course
   const courseId = parseInt(req.params.courseId);
 
@@ -190,7 +204,7 @@ app.post("/users/courses/:courseId",validateUser, (req, res) => {
   }
 });
 
-app.get("/users/purchasedCourses",validateUser, (req, res) => {
+app.get("/users/purchasedCourses", validateUser, (req, res) => {
   // logic to view purchased courses
   return res.status(201).json({ Courses: PURCHASED_COURSES });
 });
@@ -199,6 +213,18 @@ app.use((req, res, next) => {
   res.status(404).send();
 });
 
-app.listen(3000, () => {
-  console.log("Server is listening on port 3000");
-});
+
+mongoose.set('strictQuery',false)
+mongoose
+  .connect(
+    "mongodb+srv://admin:lavi9921@kartiktest.jqnuke5.mongodb.net/"
+  )
+  .then(() => {
+    console.log("Connected!");
+    app.listen(3000, () => {
+      console.log("Server is listening on port 3000");
+    });
+  })
+  .catch((err) => {
+    console.log(err);
+  });
