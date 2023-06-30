@@ -18,7 +18,7 @@ let PURCHASED_COURSES = [];
 // Admin routes
 
 const validateAdmin = (req, res, next) => {
-  const token = req.headers["authorization"].split(" ")[1];
+  const token = req.headers["authorization"] && req.headers["authorization"].split(" ")[1];
   console.log(token);
   if (!token) {
     return res.status(401).json({ message: "Token is not provided" });
@@ -149,7 +149,7 @@ app.get("/admin/courses", validateAdmin, async (req, res) => {
 
 // User routes
 const validateUser = (req, res, next) => {
-  const token = req.headers["authorization"]?.split(" ")[1];
+  const token = req.headers["authorization"] &&  req.headers["authorization"]?.split(" ")[1];
   console.log(token);
   if (!token) {
     return res.status(401).json({ message: "Token is not provided" });
