@@ -5,20 +5,17 @@ const Admin = require("./models/Admin");
 const Courses = require("./models/Courses");
 const User = require("./models/User");
 const mongoose = require("mongoose");
-
+var cors = require("cors");
 const SECRET_KEY = "mysecretkey";
 
 app.use(express.json());
-
-let ADMINS = [];
-let USERS = [];
-let COURSES = [];
-let PURCHASED_COURSES = [];
+app.use(cors());
 
 // Admin routes
 
 const validateAdmin = (req, res, next) => {
-  const token = req.headers["authorization"] && req.headers["authorization"].split(" ")[1];
+  const token =
+    req.headers["authorization"] && req.headers["authorization"].split(" ")[1];
   console.log(token);
   if (!token) {
     return res.status(401).json({ message: "Token is not provided" });
@@ -149,7 +146,8 @@ app.get("/admin/courses", validateAdmin, async (req, res) => {
 
 // User routes
 const validateUser = (req, res, next) => {
-  const token = req.headers["authorization"] &&  req.headers["authorization"]?.split(" ")[1];
+  const token =
+    req.headers["authorization"] && req.headers["authorization"]?.split(" ")[1];
   console.log(token);
   if (!token) {
     return res.status(401).json({ message: "Token is not provided" });
@@ -211,6 +209,7 @@ app.post("/users/login", async (req, res) => {
     return res.status(201).json({
       message: "Logged in successfully",
       Token: token,
+      user: userData.username,
     });
   } else {
     return res.json({ message: "Username or Password is Incorrect" });
