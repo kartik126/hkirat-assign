@@ -27,12 +27,13 @@ function Login() {
       .then((data) => {
         console.log(data);
         if (data.Token) {
-          navigate("/");
+          navigate("/dashboard");
         } else {
           alert(data.message);
         }
         Cookies.set("token", data.Token);
         Cookies.set("user", data.user);
+
       })
       .catch((error) => {
         console.error(error);

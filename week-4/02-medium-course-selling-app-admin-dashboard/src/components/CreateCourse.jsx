@@ -1,22 +1,19 @@
 import React, { useState } from "react";
 import Cookies from "js-cookie";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 const CreateCourse = () => {
+  const navigate = useNavigate();
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [photo, setPhoto] = useState("");
   const fileInputRef = React.useRef(null);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Perform form submission logic here
-    // You can access the form values using the state variables (title, description, price, photo)
-    // For example: console.log(title, description, price, photo);
-  };  
-
   const createCourse = async () => {
-
     try {
       const token = Cookies.get("token");
       console.log("cookie", token);
@@ -41,19 +38,36 @@ const CreateCourse = () => {
       }
 
       const data = await response.json();
+      toast.success(data.message);
+      setTimeout(() => {
+        navigate("/courses");
+      }, 1000);
       const { imageUrl } = data;
       console.log("Image URL:", imageUrl);
     } catch (error) {
+      toast.error(data.message);
       console.error("Error:", error);
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="w-1/2 bg-white p-8 rounded shadow-md">
-        <h2 className="text-2xl font-semibold mb-6">Create a Course</h2>
+    <>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+      <div className="flex justify-center items-center min-h-screen bg-[#F4F4F6]">
+        <div className="w-1/2 bg-white p-8 rounded shadow-md">
+          <h2 className="text-2xl font-semibold mb-6">Create a Course</h2>
 
-        <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
               htmlFor="title"
@@ -134,9 +148,9 @@ const CreateCourse = () => {
               Create
             </button>
           </div>
-        </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

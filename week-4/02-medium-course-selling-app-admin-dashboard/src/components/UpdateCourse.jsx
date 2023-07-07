@@ -1,35 +1,33 @@
 import React, { useState } from "react";
 import Cookies from "js-cookie";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const UpdateCourse = ({props}) => {
+const UpdateCourse = () => {
+  const navigate = useNavigate();
+
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const querytitle = queryParams.get('title');
-  const querydesc = queryParams.get('description');
-  const queryprice = queryParams.get('price');
-
+  const querytitle = queryParams.get("title");
+  const querydesc = queryParams.get("description");
+  const queryprice = queryParams.get("price");
 
   console.log(queryParams);
 
   const [title, setTitle] = useState(querytitle);
   const [description, setDescription] = useState(querydesc);
   const [price, setPrice] = useState(queryprice);
-  const [photo, setPhoto] = useState("");
   const fileInputRef = React.useRef(null);
 
   const params = useParams();
-  console.log(params)
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Perform form submission logic here
-    // You can access the form values using the state variables (title, description, price, photo)
-    // For example: console.log(title, description, price, photo);
-  };  
+  console.log(params);
 
-  const createCourse = async () => {
+  const updateCourse = async () => {
+    // e.preventDefault();
 
     try {
+      const courseId = params.id;
       const token = Cookies.get("token");
       console.log("cookie", token);
 
@@ -40,13 +38,16 @@ const UpdateCourse = ({props}) => {
       formData.append("published", true);
       formData.append("imageLink", fileInputRef.current.files[0]);
 
-      const response = await fetch("http://localhost:3000/admin/courses", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
+      const response = await fetch(
+        `http://localhost:3000/admin/courses/${courseId}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Request failed");
@@ -54,6 +55,10 @@ const UpdateCourse = ({props}) => {
 
       const data = await response.json();
       const { imageUrl } = data;
+      toast.success(data.message);
+      setTimeout(() => {
+        navigate("/courses");
+      }, 1000);
       console.log("Image URL:", imageUrl);
     } catch (error) {
       console.error("Error:", error);
@@ -61,11 +66,23 @@ const UpdateCourse = ({props}) => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="w-1/2 bg-white p-8 rounded shadow-md">
-        <h2 className="text-2xl font-semibold mb-6">Edit course</h2>
+    <>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+      <div className="flex justify-center items-center min-h-screen bg-gray-100">
+        <div className="w-1/2 bg-white p-8 rounded shadow-md">
+          <h2 className="text-2xl font-semibold mb-6">Edit course</h2>
 
-        <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
               htmlFor="title"
@@ -139,16 +156,16 @@ const UpdateCourse = ({props}) => {
 
           <div className="flex justify-end">
             <button
-              onClick={() => createCourse()}
+              onClick={() => updateCourse()}
               type="submit"
               className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded focus:outline-none"
             >
               Update
             </button>
           </div>
-        </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

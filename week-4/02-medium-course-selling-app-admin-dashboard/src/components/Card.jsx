@@ -7,19 +7,45 @@ const Card = ({ title, description, imageUrl, courseId, price }) => {
     title: title,
     description: description,
     price: price,
+    imageUrl: imageUrl,
+  };
+
+  const deleteCourse = (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this course?"
+    );
+
+    if (confirmDelete) {
+      fetch(`http://localhost:3000/admin/courses/${id}`, {
+        method: "DELETE",
+      })
+        .then((response) => {
+          if (response.ok) {
+            alert("Data deleted successfully");
+          } else {
+            response.json().then((data) => {
+              console.error("Error deleting data:", data.error);
+              alert("Error deleting data");
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Network error:", error);
+        });
+    }
   };
 
   return (
-    <div className=" card shadow-lg text-[#474141]">
+    <div className="card shadow-lg text-[#474141]">
       <img
         src={`http://localhost:3000/${imageUrl}`}
         alt="Card"
         className="card-image rounded-t-md"
-        style={{ height: "220px" }}
+        style={{ height: "190px" }}
       />
       <div className="card-content p-2">
         <div className="flex justify-between">
-          <h2 className="card-title text-xl font-bold">{title || "title"}</h2>
+          <h2 className="card-title text-lg font-bold">{title || "title"}</h2>
           <h2 className="card-title text-md font-semibold">Rs.{price}</h2>
         </div>
         <p className="card-description text-xs pt-2">{description}</p>
@@ -31,11 +57,14 @@ const Card = ({ title, description, imageUrl, courseId, price }) => {
             search: new URLSearchParams(queryParams).toString(),
           }}
         >
-          <button className="mx-2 bg-[#3B82F6] cursor-pointer text-sm text-white px-3 py-2 rounded-md">
+          <button className="mx-2 bg-[#5EC4A0] hover:bg-green-500 cursor-pointer text-sm text-white px-3 py-2 rounded-md">
             Edit Course
           </button>
         </Link>
-        <button className="bg-red-500 cursor-pointer text-sm text-white px-3 py-2 rounded-md">
+        <button
+          onClick={() => deleteCourse(courseId)}
+          className="bg-[#FEEFF2] hover:bg-red-500 cursor-pointer text-sm text-red-600 hover:text-white  px-3 py-2 rounded-md "
+        >
           Delete Course
         </button>
       </div>

@@ -27,7 +27,7 @@ function useCourses() {
       .catch((error) => {
         console.error(error);
       });
-  }, []);
+  }, [courses]);
 
   return courses;
 }

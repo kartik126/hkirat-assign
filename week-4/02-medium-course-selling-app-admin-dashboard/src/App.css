@@ -21,9 +21,10 @@
 }
 
 .card {
-  width: 25rem;
+  width: 22rem;
   border: 1px solid #cfcfcf;
   border-radius: 10px;
+  background-color: #fff;
 }
 
 .card img {

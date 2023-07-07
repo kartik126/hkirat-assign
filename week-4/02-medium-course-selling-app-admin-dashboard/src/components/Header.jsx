@@ -1,24 +1,19 @@
+import Cookies from "js-cookie";
 import React from "react";
 
 function Header() {
+  const user = Cookies.get("user");
   return (
     <div>
-      <header className=" shadow" style={{background:'rgb(59 130 246)'}}>
+      <header className=" shadow" >
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex flex-row items-center">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-100" >
-            Dashboard
-          </h1>
-          <a className="pl-20 cursor-pointer text-gray-100" href="/courses">Courses</a>
-          <a className="px-10 cursor-pointer text-gray-100" href="/createcourse">
-            Create course
-          </a>
-          <a className="cursor-pointer text-gray-100">Update course</a>
 
           <div
-            className="right-10 bg-gray-200 p-2 px-10 rounded-full "
+            className="right-10 bg-[#5EC4A0] text-white p-2 px-10 rounded-full "
             style={{ position: "absolute" }}
           >
-            <p>Hi! Kartik</p>
+          
+            <p className="text-sm font-semibold">{user}</p>
           </div>
         </div>
       </header>
