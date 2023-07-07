@@ -5,10 +5,10 @@ function Header() {
     <div>
       <header className=" shadow" style={{background:'rgb(59 130 246)'}}>
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex flex-row items-center">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-100">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-100" >
             Dashboard
           </h1>
-          <a className="pl-20 cursor-pointer text-gray-100">Courses</a>
+          <a className="pl-20 cursor-pointer text-gray-100" href="/courses">Courses</a>
           <a className="px-10 cursor-pointer text-gray-100" href="/createcourse">
             Create course
           </a>

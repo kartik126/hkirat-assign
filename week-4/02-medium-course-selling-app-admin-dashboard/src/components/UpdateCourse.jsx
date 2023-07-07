@@ -1,13 +1,25 @@
 import React, { useState } from "react";
 import Cookies from "js-cookie";
+import { useLocation, useParams } from "react-router-dom";
 
-const CreateCourse = () => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
+const UpdateCourse = ({props}) => {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const querytitle = queryParams.get('title');
+  const querydesc = queryParams.get('description');
+  const queryprice = queryParams.get('price');
+
+
+  console.log(queryParams);
+
+  const [title, setTitle] = useState(querytitle);
+  const [description, setDescription] = useState(querydesc);
+  const [price, setPrice] = useState(queryprice);
   const [photo, setPhoto] = useState("");
   const fileInputRef = React.useRef(null);
 
+  const params = useParams();
+  console.log(params)
   const handleSubmit = (e) => {
     e.preventDefault();
     // Perform form submission logic here
@@ -51,7 +63,7 @@ const CreateCourse = () => {
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="w-1/2 bg-white p-8 rounded shadow-md">
-        <h2 className="text-2xl font-semibold mb-6">Create a Course</h2>
+        <h2 className="text-2xl font-semibold mb-6">Edit course</h2>
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -131,7 +143,7 @@ const CreateCourse = () => {
               type="submit"
               className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded focus:outline-none"
             >
-              Create
+              Update
             </button>
           </div>
         </form>
@@ -140,4 +152,4 @@ const CreateCourse = () => {
   );
 };
 
-export default CreateCourse;
+export default UpdateCourse;
