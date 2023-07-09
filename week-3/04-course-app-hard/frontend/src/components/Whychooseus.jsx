@@ -6,7 +6,6 @@ function CardComponent({ title }) {
   return (
     <div className="w-1/2 bg-[#fff] rounded-xl h-fit p-7 m-2">
       <div className="flex items-center justify-center bg-orange-500 w-[60px] h-[60px] rounded-lg mb-7 text-white">
-        1
       </div>
       <h1 className="text-[25px] font-bold leading-none">{title}</h1>
       <p className="text-[#939393] pt-3">

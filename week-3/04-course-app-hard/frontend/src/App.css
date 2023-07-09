@@ -19,6 +19,13 @@
 .card img{
   width: 100%;
 }
+.paragraph {
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Number of lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 @keyframes logo-spin {
   from {
     transform: rotate(0deg);
