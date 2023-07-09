@@ -1,8 +1,7 @@
 import Cookies from "js-cookie";
 import React from "react";
 
-const Card = ({ title, description, imageUrl ,courseId}) => {
-
+const Card = ({ title, description, imageUrl, courseId }) => {
   const purchaseCourse = (id) => {
     const token = Cookies.get("token");
     fetch(`http://localhost:3000/users/courses/${id}`, {
@@ -21,11 +20,10 @@ const Card = ({ title, description, imageUrl ,courseId}) => {
       .then((data) => {
         console.log(data);
         if (data.Token) {
-          alert(data.message)
+          alert(data.message);
         } else {
           alert(data.message);
         }
-       
       })
       .catch((error) => {
         console.error(error);
@@ -39,7 +37,7 @@ const Card = ({ title, description, imageUrl ,courseId}) => {
         <h2 className="card-title">{title}</h2>
         <p className="card-description">{description}</p>
       </div>
-      <button onClick={()=>purchaseCourse(courseId)}>Purchase</button>
+      <button onClick={() => purchaseCourse(courseId)}>Purchase</button>
     </div>
   );
 };

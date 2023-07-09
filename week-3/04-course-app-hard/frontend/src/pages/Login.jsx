@@ -15,6 +15,7 @@ function Login() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Accept":'*/*',
         username: name,
         password: password,
       },
@@ -27,6 +28,7 @@ function Login() {
       })
       .then((data) => {
         console.log(data);
+        alert(data.message)
         if (data.Token) {
           navigate("/");
         } else {
