@@ -1,4 +1,5 @@
 const express = require("express");
+require("dotenv").config();
 const app = express();
 const jwt = require("jsonwebtoken");
 const Admin = require("./models/Admin");
@@ -7,10 +8,37 @@ const User = require("./models/User");
 const mongoose = require("mongoose");
 var cors = require("cors");
 const SECRET_KEY = "mysecretkey";
-
+var bodyParser = require("body-parser");
 app.use(express.json());
 app.use(cors());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+var fs = require("fs");
+var path = require("path");
+const { v4: uuidv4 } = require("uuid"); // Import the UUID module
+var multer = require("multer");
+app.use(express.static("uploads"));
+// Increase payload size limit to 10MB
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  })
+);
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    // Customize the filename if needed
+    cb(null, file.originalname);
+  },
+});
 
+const upload = multer({ storage: storage });
 // Admin routes
 
 const validateAdmin = (req, res, next) => {
@@ -69,7 +97,7 @@ app.post("/admin/login", async (req, res) => {
     return res.json({ message: "Enter username and password" });
   }
 
-  const token = jwt.sign(userData, SECRET_KEY, { expiresIn: "1h" });
+  const token = jwt.sign(userData, SECRET_KEY);
 
   const findAdmin = await Admin.find({
     username: userData.username,
@@ -80,58 +108,74 @@ app.post("/admin/login", async (req, res) => {
     return res.status(201).json({
       message: "Logged in successfully",
       Token: token,
+      user: userData.username,
     });
   } else {
     return res.json({ message: "Username or Password is Incorrect" });
   }
 });
 
-app.post("/admin/courses", validateAdmin, async (req, res) => {
-  // logic to create a course
-  let courseId = Math.floor(Math.random() * 100);
+const corsOptions = {
+  origin: "http://localhost:5173", // Replace with your client's origin
+};
 
-  const course = {
-    title: req.body.title,
-    description: req.body.description,
-    price: req.body.price,
-    imageLink: req.body.imageLink,
-    published: req.body.published,
-  };
+app.post(
+  "/admin/courses",
+  validateAdmin,
+  cors(corsOptions),
+  upload.single("imageLink"),
+  async (req, res) => {
+    const course = {
+      title: req.body.title,
+      description: req.body.description,
+      price: req.body.price,
+      imageLink: req.file.filename,
+      published: req.body.published,
+    };
 
-  const createCourse = await Courses.create(course);
+    const createCourse = await Courses.create(course);
 
-  return res.status(201).json({
-    message: "Course created successfully",
-    createCourse,
-  });
-});
+    const imageUrl = `http://localhost:3000/${req.file.filename}`;
 
-app.put("/admin/courses/:courseId", validateAdmin, async (req, res) => {
-  // logic to edit a course
-
-  const courseId = req.params.courseId.toString();
-
-  const course = {
-    title: req.body.title,
-    description: req.body.description,
-    price: req.body.price,
-    imageLink: req.body.imageLink,
-    published: req.body.published,
-  };
-
-  const updateCourse = await Courses.findByIdAndUpdate(courseId, course);
-
-  if (!updateCourse) {
-    return res
-      .status(404)
-      .json({ message: `Cannot find the course with id ${courseId}` });
-  } else {
-    const updatedCourse = await Courses.findById(courseId);
-    return res
-      .status(201)
-      .json({ message: "Course updated successfully", updatedCourse });
+    return res.status(201).json({
+      message: "Course created successfully",
+      createCourse,
+      imageUrl: imageUrl,
+    });
   }
-});
+);
+
+app.put(
+  "/admin/courses/:courseId",
+  validateAdmin,
+  upload.single("imageLink"),
+  async (req, res) => {
+    // logic to edit a course
+
+    const courseId = req.params.courseId.toString();
+
+    const course = {
+      title: req.body.title,
+      description: req.body.description,
+      price: req.body.price,
+      imageLink: req.file.filename,
+      published: req.body.published,
+    };
+
+    const updateCourse = await Courses.findByIdAndUpdate(courseId, course);
+
+    if (!updateCourse) {
+      return res
+        .status(404)
+        .json({ message: `Cannot find the course with id ${courseId}` });
+    } else {
+      const updatedCourse = await Courses.findById(courseId);
+      return res
+        .status(201)
+        .json({ message: "Course updated successfully", updatedCourse });
+    }
+  }
+);
 
 app.get("/admin/courses", validateAdmin, async (req, res) => {
   // logic to get all courses
@@ -142,6 +186,18 @@ app.get("/admin/courses", validateAdmin, async (req, res) => {
   } catch (err) {
     res.status(404).json({ message: err.message });
   }
+});
+
+app.delete("/admin/courses/:courseId", async (req, res) => {
+  const { courseId } = req.params;
+
+  await Courses.findByIdAndRemove(courseId)
+    .then(() => {
+      res.status(200).json({ message: "Data deleted successfully" });
+    })
+    .catch((error) => {
+      res.status(500).json({ error: "Error deleting data" });
+    });
 });
 
 // User routes
@@ -267,15 +323,18 @@ app.use((req, res, next) => {
   res.status(404).send();
 });
 
+const uri = process.env.MONGODB_URI;
+
 mongoose.set("strictQuery", false);
+
 mongoose
-  .connect("mongodb+srv://admin:lavi9921@kartiktest.jqnuke5.mongodb.net/")
+  .connect(uri)
   .then(() => {
-    console.log("Connected!");
+    console.log("Connected to MongoDB");
     app.listen(3000, () => {
       console.log("Server is listening on port 3000");
     });
   })
   .catch((err) => {
-    console.log(err);
+    console.log("Error connecting to MongoDB:", err);
   });

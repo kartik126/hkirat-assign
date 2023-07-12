@@ -14,9 +14,10 @@ const courseSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    imageLink: {
+    imageLink:  {
       type: String,
-    },
+      path: String
+  },
     published: {
       type: String,
     },
