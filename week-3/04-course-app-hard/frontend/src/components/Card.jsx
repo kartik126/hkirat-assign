@@ -31,13 +31,18 @@ const Card = ({ title, description, imageUrl, courseId }) => {
   };
 
   return (
-    <div className="card">
-      <img src={imageUrl} alt="Card" className="card-image" />
-      <div className="card-content">
-        <h2 className="card-title">{title}</h2>
-        <p className="card-description">{description}</p>
+    <div className="col-span-1 border bg-white rounded-lg flex flex-col w-[300px] h-fit cursor-pointer">
+      <img
+        className="w-[300px] rounded-t-lg"
+        src={`http://localhost:3000/${imageUrl}`}
+      />
+      <div className="pt-2 px-2">
+        <h1 className="font-bold">{title}</h1>
+        <p className="paragraph text-[12px] text-gray-500">{description}</p>
+        <div className="flex pt-5 justify-between items-center">
+          {/* <p className="text-[#11906D] font-bold ">Rs. {price}</p> */}
+        </div>
       </div>
-      <button onClick={() => purchaseCourse(courseId)}>Purchase</button>
     </div>
   );
 };

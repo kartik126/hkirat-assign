@@ -1,18 +1,29 @@
 import Cookies from "js-cookie";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Card from "../components/Card";
 import useCourses from "../customHooks/useCourses";
 import { Link } from "react-router-dom";
 import Mainbanner from "../components/Mainbanner";
 import Whychooseus from "../components/Whychooseus";
 import BestCourses from "../components/BestCourses";
+import Footer from "../components/Footer";
 
 function Home() {
+
   const getCourses = useCourses();
 
-  const [user, setuser] = React.useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [user, setuser] = useState("");
 
-  React.useEffect(() => {
+  const handleModalOpen = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  useEffect(() => {
     getCourses;
     console.log("home page", getCourses);
     const user = Cookies.get("user");
@@ -47,6 +58,7 @@ function Home() {
           })}
         </div>
       </div> */}
+      <Footer/>
     </div>
   );
 }
