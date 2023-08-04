@@ -3,12 +3,21 @@ import { authenticateJwt, SECRET } from '../middleware/index';
 import { Todo } from '../db';
 const router = express.Router();
 
-router.post('/todos', authenticateJwt, async (req: Request, res: Response) => {
-  const { title, description } = req.body;
-  const done = false;
-  const userId = req.userId;
+interface createTodo {
 
-  const newTodo = new Todo({ title, description, done, userId });
+  title: string;
+  description: string;
+}
+
+router.post('/todos', authenticateJwt, async (req, res) => {
+
+  const input : createTodo = req.body;
+
+  const done = false;
+  const userId = req.headers["userId"];
+
+
+  const newTodo = new Todo({ title :input.title, description:input.description, done, userId });
 
   try {
     const savedTodo = await newTodo.save();
@@ -18,8 +27,9 @@ router.post('/todos', authenticateJwt, async (req: Request, res: Response) => {
   }
 });
 
-router.get('/todos', authenticateJwt, async (req: Request, res: Response) => {
-  const userId = req.userId;
+router.get('/todos', authenticateJwt, async (req, res) => {
+  const userId = req.headers["userId"];
+
 
   try {
     const todos = await Todo.find({ userId });
@@ -29,10 +39,10 @@ router.get('/todos', authenticateJwt, async (req: Request, res: Response) => {
   }
 });
 
-router.patch('/todos/:todoId/done', authenticateJwt, async (req: Request, res: Response) => {
-  const { todoId } = req.params;
-  const userId = req.userId;
+router.patch('/todos/:todoId/done', authenticateJwt, async (req, res) => {
 
+  const userId = req.headers["userId"];
+  const { todoId } = req.params;
   try {
     const updatedTodo = await Todo.findOneAndUpdate(
       { _id: todoId, userId },

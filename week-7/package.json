@@ -1,0 +1,7 @@
+{
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/mongoose": "^5.11.97",
+    "@types/node": "^20.4.7"
+  }
+}
