@@ -4,6 +4,13 @@
   /* font-family: 'Raleway', sans-serif; */
   /* font-family: 'Roboto Slab', serif; */
 }
+.paragraph {
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Number of lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 .logo {
   height: 6em;

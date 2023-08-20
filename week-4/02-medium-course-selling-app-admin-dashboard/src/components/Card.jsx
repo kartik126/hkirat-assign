@@ -46,9 +46,10 @@ const Card = ({ title, description, imageUrl, courseId, price }) => {
       <div className="card-content p-2">
         <div className="flex justify-between">
           <h2 className="card-title text-lg font-bold">{title || "title"}</h2>
-          <h2 className="card-title text-md font-semibold">Rs.{price}</h2>
         </div>
-        <p className="card-description text-xs pt-2">{description}</p>
+        <h2 className="card-title text-md font-semibold">Rs.{price}</h2>
+
+        <p className="paragraph card-description text-xs pt-2">{description}</p>
       </div>
       <div className="flex justify-end p-5">
         <Link
